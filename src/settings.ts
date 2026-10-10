@@ -13,10 +13,11 @@ export interface Settings {
   suspense: boolean;
   wakeLock: boolean;
   undo: boolean;
+  quickDraw: boolean;
   rules: SessionRules;
 }
 
-export type Toggle = 'sound' | 'vibration' | 'suspense' | 'wakeLock' | 'undo';
+export type Toggle = 'sound' | 'vibration' | 'suspense' | 'wakeLock' | 'undo' | 'quickDraw';
 
 export const DEFAULT_SETTINGS: Settings = {
   deckSize: 40,
@@ -27,6 +28,7 @@ export const DEFAULT_SETTINGS: Settings = {
   suspense: true,
   wakeLock: true,
   undo: true,
+  quickDraw: true,
   rules: { igualReparte: false, asReyDoble: false, puenteLimpio: false },
 };
 
@@ -55,6 +57,7 @@ export function parseSettings(raw: string | null | undefined): Settings {
     suspense: bool(s.suspense, d.suspense),
     wakeLock: bool(s.wakeLock, d.wakeLock),
     undo: bool(s.undo, d.undo),
+    quickDraw: bool(s.quickDraw, d.quickDraw),
     rules: {
       igualReparte: bool(rules.igualReparte, d.rules.igualReparte),
       asReyDoble: bool(rules.asReyDoble, d.rules.asReyDoble),

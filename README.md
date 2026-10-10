@@ -5,7 +5,7 @@ Juego de cartas con baraja española para jugar con amigos sin llevar baraja enc
 ## Reglas
 
 - Se reparten 4 cartas boca arriba y una boca abajo en horizontal entre la 2ª y la 3ª: **el puente** (es una carta real que sale de la baraja).
-- Elige tu apuesta y toca la carta resaltada: la nueva carta se coloca encima.
+- Elige tu apuesta y la nueva carta sale encima de la carta resaltada (si desactivas *Sacar al elegir* en ⚙️, hay que tocar la carta después).
   - **Posiciones 1 y 2**: mayor, menor o igual. Si sale igual y dijiste mayor/menor, fallas.
   - **Posición 3**: par o impar (Sota=10, Caballo=11, Rey=12).
   - **Posición 4**: palo (oros, copas, espadas, bastos).
@@ -27,6 +27,7 @@ Se guarda el **récord** del dispositivo (menos tragos en un turno) y el resulta
 | Partida | Baraja de 40 o 48 cartas | 40 |
 | Partida | Jugadores (sin jugadores = solitario) | — |
 | Mesa | Orientación: horizontal (pide girar el móvil) o vertical | Horizontal |
+| Mesa | Sacar al elegir: la carta sale al pulsar la apuesta, sin tocarla | ✅ |
 | Mesa | Sonido | ✅ |
 | Mesa | Vibración (no disponible en iPhone) | ✅ |
 | Mesa | Suspense: la carta se voltea con redoble | ✅ |

@@ -141,6 +141,11 @@ describe('configuración', () => {
     expect(s.rules).toEqual({ igualReparte: false, asReyDoble: true, puenteLimpio: false });
   });
 
+  it('sacar al elegir activado por defecto y desactivable', () => {
+    expect(DEFAULT_SETTINGS.quickDraw).toBe(true);
+    expect(parseSettings(JSON.stringify({ quickDraw: false })).quickDraw).toBe(false);
+  });
+
   it('orientación horizontal por defecto, vertical si se eligió', () => {
     expect(DEFAULT_SETTINGS.orientation).toBe('horizontal');
     expect(parseSettings(JSON.stringify({ orientation: 'vertical' })).orientation).toBe('vertical');

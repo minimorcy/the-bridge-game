@@ -37,6 +37,7 @@ const GUESS_LABEL: Partial<Record<Guess, string>> = {
   impar: 'Impar',
 };
 const TOGGLES: { key: Toggle; label: string; desc: string }[] = [
+  { key: 'quickDraw', label: 'Sacar al elegir', desc: 'La carta sale al pulsar la apuesta, sin tocar la carta.' },
   { key: 'sound', label: 'Sonido', desc: 'Efectos al sacar carta, beber y cruzar.' },
   { key: 'vibration', label: 'Vibración', desc: 'Vibra cuando toca beber (no disponible en iPhone).' },
   { key: 'suspense', label: 'Suspense', desc: 'La carta sale boca abajo y se voltea con redoble.' },
@@ -103,9 +104,10 @@ function message(): string {
   if (pending) return '🥁 …';
   const t = session.game.lastTurn;
   if (!t) {
+    const how = settings.quickDraw ? 'elige tu apuesta para sacar carta' : 'elige y toca la carta resaltada';
     return session.solo
-      ? 'Elige tu apuesta y toca la carta resaltada.'
-      : `Turno de <b>${escapeHtml(currentPlayer(session).name)}</b>: elige y toca la carta resaltada.`;
+      ? `${how[0].toUpperCase()}${how.slice(1)}.`
+      : `Turno de <b>${escapeHtml(currentPlayer(session).name)}</b>: ${how}.`;
   }
   return `${t.correct ? '✅ ¡Acierto!' : '❌ Fallo.'} Salió <b>${cardLabel(t.drawn)}</b>.`;
 }
@@ -410,7 +412,11 @@ app.addEventListener('click', (e) => {
   if (!el) return;
   const { guess, slot, action, deck, orientation, remove, give } = el.dataset;
 
-  if (guess && !pending) {
+  if (guess && !pending && settings.quickDraw) {
+    selected = guess as Guess;
+    draw();
+    return;
+  } else if (guess && !pending) {
     selected = selected === guess ? null : (guess as Guess);
   } else if (slot !== undefined && Number(slot) === session.game.position) {
     draw();
