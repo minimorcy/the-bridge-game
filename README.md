@@ -113,6 +113,7 @@ Problemas habituales:
 
 - *502 Bad Gateway*: revisa que *Ports Exposes* sea `80`.
 - *Falla `npm ci`*: falta `package-lock.json` en el repositorio.
+- *`npm error network ECONNRESET`*: corte de red puntual al descargar de npm; el build ya reintenta, pero si persiste basta con **Redeploy**.
 - *Se sigue viendo la versión anterior*: cierra y vuelve a abrir la app; el service worker se actualiza en la siguiente apertura.
 
 Para probar la imagen en local:
