@@ -8,6 +8,7 @@ Al fallar en la posición 3 se beben 2 tragos y siempre hay alguien que pregunta
 
 - En el aviso de beber, cuando el fallo hace cruzar el puente, se oculta el motivo y aparece un botón **"?"**.
 - Al pulsarlo: "¿Quieres saber por qué bebes dos? Porque has fallado (🍺 1) y pasas el puente (🍺 1)." (con *As o Rey, doble*, el fallo cuenta 2 y se ve en el desglose).
+- Dentro de la explicación, **"🤔 Sigo sin entenderlo"** abre un modal de coña que lo explica "muy despacito" paso a paso. Si se pulsa **"😵 Pues no…"**, se rinde: "Mira, da igual. Tú bebe, que ya lo entenderás mañana".
 
 ## Impact
 

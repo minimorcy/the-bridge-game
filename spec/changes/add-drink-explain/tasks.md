@@ -4,3 +4,4 @@
 2. [x] Explicación con el desglose (fallo + puente), contemplando "As o Rey, doble".
 3. [x] Reiniciar la explicación en cada robo.
 4. [x] Tests, build y verificación visual.
+5. [x] Modal de coña "vamos despacito" con paso a paso y rendición final; compacto en apaisado.

@@ -66,7 +66,8 @@ let animate = false;
 let shareLeft = 0;
 let newRecord = false;
 let focusPlayerInput = false;
-let explainOpen = false;
+/** 0: botón "?", 1: explicación, 2: explicación para tontitos, 3: rendición. */
+let explainLevel = 0;
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const overlay = (): Overlay => queue[0] ?? 'none';
@@ -150,13 +151,42 @@ function drinkExplain(): string {
   const t = session.game.lastTurn!;
   const failDrinks = t.drinks - 1;
   const n = NUMBER_WORD[t.drinks] ?? String(t.drinks);
-  if (!explainOpen) {
+  if (explainLevel === 0) {
     return `<button class="explain-btn" data-action="explain" aria-label="¿Por qué bebo ${n}?">?</button>`;
   }
   return `<div class="explain">
     <p><b>¿Quieres saber por qué bebes ${n}?</b></p>
     <p>Porque ${failText(t).toLowerCase()} (🍺 ${failDrinks}) y pasas el puente (🍺 1).</p>
+    <button class="link" data-action="explain">🤔 Sigo sin entenderlo</button>
   </div>`;
+}
+
+/** La coña: lo mismo, pero muy despacito. */
+function slowExplainHtml(): string {
+  const t = session.game.lastTurn!;
+  const failDrinks = t.drinks - 1;
+  const n = NUMBER_WORD[t.drinks] ?? String(t.drinks);
+  if (explainLevel >= 3) {
+    return `<div class="overlay top"><div class="panel">
+      <div class="big">🙄</div>
+      <h2>Mira, da igual</h2>
+      <p>Tú bebe, que ya lo entenderás mañana.</p>
+      <button class="primary" data-action="explain-close">🍻 Vale, bebo</button>
+    </div></div>`;
+  }
+  return `<div class="overlay top"><div class="panel slow">
+    <div class="big">🐢</div>
+    <h2>Vale, vamos despacito…</h2>
+    <ol class="steps">
+      <li>Has <b>fallado</b>. Fallar = beber. ${'🍺'.repeat(failDrinks)}</li>
+      <li>Al fallar vas <b>para atrás</b> ⬅️. ¿Y qué hay detrás? <b>EL PUENTE</b> 🌉</li>
+      <li>Pasar el puente = beber. 🍺</li>
+      <li>${'🍺 + '.repeat(failDrinks)}🍺 = <b>${n}</b>. Cuéntalo con los dedos si hace falta ${t.drinks === 2 ? '✌️' : '🖐️'}</li>
+    </ol>
+    <p class="muted">¿Lo pillas, campeón?</p>
+    <button class="primary" data-action="explain-close">💡 ¡Ahora sí!</button>
+    <button data-action="explain">😵 Pues no…</button>
+  </div></div>`;
 }
 
 function failText(t: Turn): string {
@@ -185,7 +215,7 @@ function overlayHtml(): string {
         ${drinkReason() ? `<p>${drinkReason()}</p>` : ''}
         ${t && !t.correct && crossesBridge(t.from, t.to) ? drinkExplain() : ''}
         <button class="primary" data-action="next-overlay">Hecho</button>
-        ${undoButton()}`);
+        ${undoButton()}`) + (explainLevel >= 2 ? slowExplainHtml() : '');
     case 'share':
       return panel(`
         <div class="big">🫵</div>
@@ -361,7 +391,7 @@ function reveal(): void {
   const won = session.game.status === 'won';
   queue = [];
   newRecord = false;
-  explainOpen = false;
+  explainLevel = 0;
   if (t.drinks > 0) queue.push('drink');
   if (t.share > 0) {
     shareLeft = t.share;
@@ -475,7 +505,9 @@ app.addEventListener('click', (e) => {
   } else if (action === 'close-settings') {
     settingsOpen = false;
   } else if (action === 'explain') {
-    explainOpen = true;
+    explainLevel = Math.min(explainLevel + 1, 3);
+  } else if (action === 'explain-close') {
+    explainLevel = 1;
   } else if (action === 'portrait') {
     updateSettings({ orientation: 'vertical' });
   } else if (action === 'rotate') {
