@@ -66,7 +66,7 @@ Estructura:
 
 - `src/game/` – lógica pura y testeada: baraja, reglas, partida, sesión multijugador y récord.
 - `src/settings.ts` – configuración persistida en `localStorage`.
-- `src/ui/` – cartas (sprite `src/assets/baraja-espanola.webp`), efectos de sonido/vibración, wake lock y bloqueo de orientación.
+- `src/ui/` – cartas (sprite `src/assets/baraja-espanola.webp`), efectos de sonido/vibración, wake lock, bloqueo de orientación y Umami.
 - `src/main.ts` – renderizado y eventos.
 - `assets-src/` – imagen original de la baraja; `public/icons/` – iconos generados.
 - `scripts/generate-assets.mjs` – genera el sprite WebP y los iconos.
@@ -96,8 +96,17 @@ El `Dockerfile` (multi-stage) instala dependencias, **ejecuta los tests**, const
    | Domains | `https://puente.tudominio.com` |
    | Variables de entorno | ninguna |
 
-4. En el DNS, crea un registro **A** del dominio apuntando a la IP del VPS. Coolify genera el certificado con Let's Encrypt.
-5. **Deploy**. Opcional: activa *Auto Deploy* para desplegar con cada push y el healthcheck en `/` puerto `80`.
+4. *(Opcional)* Estadísticas con [Umami](https://umami.is): en **Environment Variables** añade estas variables marcando **Build Variable** (se incrustan al construir; cambiarlas requiere *Redeploy*):
+
+   | Variable | Ejemplo |
+   |---|---|
+   | `VITE_UMAMI_SCRIPT_URL` | `https://umami.tudominio.com/script.js` |
+   | `VITE_UMAMI_WEBSITE_ID` | el *Website ID* del sitio en Umami |
+   | `VITE_UMAMI_DOMAINS` | `puente.tudominio.com` (opcional: no cuenta visitas de otros dominios) |
+
+   Si faltan, no se carga Umami. Para probar en local, copia `.env.example` a `.env.local`.
+5. En el DNS, crea un registro **A** del dominio apuntando a la IP del VPS. Coolify genera el certificado con Let's Encrypt.
+6. **Deploy**. Opcional: activa *Auto Deploy* para desplegar con cada push y el healthcheck en `/` puerto `80`.
 
 > **HTTPS es obligatorio**: sin él no funcionan el modo offline, la instalación ni la pantalla siempre encendida.
 

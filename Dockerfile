@@ -4,6 +4,10 @@ COPY package.json package-lock.json ./
 COPY scripts/ensure-native-bindings.mjs scripts/
 RUN npm ci --no-audit --no-fund && node scripts/ensure-native-bindings.mjs
 COPY . .
+# Umami (opcional): Vite las incrusta en el build, por eso son ARG y no variables de ejecución
+ARG VITE_UMAMI_SCRIPT_URL
+ARG VITE_UMAMI_WEBSITE_ID
+ARG VITE_UMAMI_DOMAINS
 RUN npm test && npm run build
 
 FROM nginx:1.27-alpine

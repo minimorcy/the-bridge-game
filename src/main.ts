@@ -19,11 +19,13 @@ import {
 } from './game/session';
 import { loadSettings, saveSettings, type Orientation, type Settings, type Toggle } from './settings';
 import { SUIT_LABEL, cardBack, cardFace, cardLabel, suitIcon } from './ui/cards';
+import { loadAnalytics } from './ui/analytics';
 import { sfx, vibrate } from './ui/fx';
 import { canLockLandscape, lockLandscape, unlockOrientation } from './ui/orientation';
 import { setWakeLock } from './ui/wake-lock';
 
 registerSW({ immediate: true });
+loadAnalytics();
 
 type Overlay = 'none' | 'drink' | 'share' | 'turnEnd' | 'won' | 'ranking' | 'deckEmpty';
 
