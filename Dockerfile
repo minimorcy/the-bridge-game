@@ -1,7 +1,8 @@
-FROM node:22-alpine AS build
+FROM node:22-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+COPY scripts/ensure-native-bindings.mjs scripts/
+RUN npm ci --no-audit --no-fund && node scripts/ensure-native-bindings.mjs
 COPY . .
 RUN npm test && npm run build
 
