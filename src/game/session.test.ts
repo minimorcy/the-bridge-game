@@ -134,9 +134,9 @@ describe('configuración', () => {
   });
 
   it('respeta lo guardado y descarta valores inválidos', () => {
-    const s = parseSettings(JSON.stringify({ deckSize: 48, undo: false, players: ['Ana', '', 3], rules: { asReyDoble: true, x: 1 } }));
+    const s = parseSettings(JSON.stringify({ deckSize: 48, sound: false, players: ['Ana', '', 3], rules: { asReyDoble: true, x: 1 } }));
     expect(s.deckSize).toBe(48);
-    expect(s.undo).toBe(false);
+    expect(s.sound).toBe(false);
     expect(s.players).toEqual(['Ana']);
     expect(s.rules).toEqual({ igualReparte: false, asReyDoble: true, puenteLimpio: false });
   });

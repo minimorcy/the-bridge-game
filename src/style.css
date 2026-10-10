@@ -110,8 +110,6 @@ button.selected { background: #fff; color: var(--ink); border-color: #fff; }
 .suit-btn { width: 20px; height: 31px; border-radius: 2px; }
 .tap-hint { text-align: center; color: var(--gold); font-weight: 600; }
 
-.actions { display: flex; justify-content: center; min-height: 48px; }
-.undo { font-size: .9rem; padding: 8px 14px; opacity: .85; }
 
 /* Marcador multijugador */
 .scoreboard { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; order: 3; flex-basis: 100%; }
@@ -123,8 +121,8 @@ button.selected { background: #fff; color: var(--ink); border-color: #fff; }
 .chip.current { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 700; }
 .chip.crossed:not(.current) { opacity: .6; }
 
-footer { margin-top: 32px; text-align: center; font-size: .7rem; opacity: .6; }
-footer a { color: inherit; }
+.credits { margin: 6px 0 0; text-align: center; font-size: .65rem; opacity: .55; }
+.credits a { color: inherit; }
 
 /* Overlays */
 .overlay {
@@ -220,8 +218,6 @@ button:disabled { opacity: .5; cursor: default; }
   .message { margin: 6px 0 4px; min-height: 1.3em; }
   .guess { padding: 6px 12px; min-width: 84px; }
   .tap-hint { display: none; }
-  .actions { position: fixed; right: 12px; bottom: 8px; min-height: 0; }
-  footer { margin-top: 16px; }
   .panel { gap: 6px; padding: 14px 18px; width: min(520px, 100%); }
   .big { font-size: 2.6rem; }
   .steps { gap: 2px; }

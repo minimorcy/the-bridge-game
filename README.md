@@ -32,7 +32,6 @@ Se guarda el **récord** del dispositivo (menos tragos en un turno) y el resulta
 | Mesa | Vibración (no disponible en iPhone) | ✅ |
 | Mesa | Suspense: la carta se voltea con redoble | ✅ |
 | Mesa | Pantalla siempre encendida | ✅ |
-| Mesa | Deshacer el último robo (un nivel, no después de cruzar) | ✅ |
 | Reglas extra | *Igual reparte*: acertar "igual" te deja repartir 2 tragos | ❌ |
 | Reglas extra | *As o Rey, doble*: fallar con un As o un Rey cuenta 2 tragos (+1 si además cruzas el puente) | ❌ |
 | Reglas extra | *Puente limpio*: cruzar sin fallar ni una hace beber 1 a todos los demás | ❌ |
@@ -125,4 +124,4 @@ docker run --rm -p 8080:80 el-puente   # http://localhost:8080
 
 ## Créditos
 
-Ilustraciones de las cartas: [Baraja española completa](https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola_completa.png), de Basquetteur (a partir del trabajo de Germarquezm y otros), Wikimedia Commons, licencia [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/deed.es). El sprite se convierte a WebP y el as de oros se usa en los iconos de la app; la atribución aparece también en el pie de la app.
+Ilustraciones de las cartas: [Baraja española completa](https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola_completa.png), de Basquetteur (a partir del trabajo de Germarquezm y otros), Wikimedia Commons, licencia [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/deed.es). El sprite se convierte a WebP y el as de oros se usa en los iconos de la app; la atribución aparece también al final del menú ⚙️ de la app.

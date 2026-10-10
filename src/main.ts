@@ -44,7 +44,6 @@ const TOGGLES: { key: Toggle; label: string; desc: string }[] = [
   { key: 'vibration', label: 'Vibración', desc: 'Vibra cuando toca beber (no disponible en iPhone).' },
   { key: 'suspense', label: 'Suspense', desc: 'La carta sale boca abajo y se voltea con redoble.' },
   { key: 'wakeLock', label: 'Pantalla siempre encendida', desc: 'Evita que el móvil se bloquee mientras jugáis.' },
-  { key: 'undo', label: 'Deshacer', desc: 'Permite deshacer el último robo si alguien toca sin querer.' },
 ];
 const ORIENTATIONS: { key: Orientation; label: string }[] = [
   { key: 'horizontal', label: '📱↔️ Horizontal' },
@@ -60,7 +59,6 @@ let settings: Settings = loadSettings();
 let session: Session = newSession(settings.players, settings.deckSize);
 /** Estado ya calculado mientras la carta se voltea (modo suspense). */
 let pending: Session | null = null;
-let undoSnapshot: Session | null = null;
 let selected: Guess | null = null;
 let queue: Overlay[] = [];
 let settingsOpen = false;
@@ -126,11 +124,6 @@ function scoreboard(): string {
     .join('')}</div>`;
 }
 
-function undoButton(): string {
-  return settings.undo && undoSnapshot && !pending
-    ? `<button class="undo" data-action="undo">↩️ Deshacer</button>`
-    : '';
-}
 
 function recordLine(): string {
   const r = loadRecord();
@@ -216,8 +209,7 @@ function overlayHtml(): string {
         <h2>${session.solo ? '¡Bebe' : `¡${me}, bebe`} ${drinksWord(t?.drinks ?? 0)}!</h2>
         ${drinkReason() ? `<p>${drinkReason()}</p>` : ''}
         ${t && !t.correct && crossesBridge(t.from, t.to) ? drinkExplain() : ''}
-        <button class="primary" data-action="next-overlay">Hecho</button>
-        ${undoButton()}`) + (explainLevel >= 2 ? slowExplainHtml() : '');
+        <button class="primary" data-action="next-overlay">Hecho</button>`) + (explainLevel >= 2 ? slowExplainHtml() : '');
     case 'share':
       return panel(`
         <div class="big">🫵</div>
@@ -229,8 +221,7 @@ function overlayHtml(): string {
                <div class="choices wrap">${session.players
                  .map((p, i) => (i === session.current ? '' : `<button data-give="${i}">${escapeHtml(p.name)} +1</button>`))
                  .join('')}</div>`
-        }
-        ${undoButton()}`);
+        }`);
     case 'turnEnd': {
       const next = session.players[nextPlayerIndex(session) ?? 0];
       return panel(`
@@ -311,6 +302,7 @@ function settingsHtml(): string {
     ${RULES.map((r) => toggle('data-rule', r.key, r.label, r.desc, settings.rules[r.key])).join('')}
     <button class="primary" data-action="new-game">Nueva partida</button>
     <button data-action="close-settings">Cerrar</button>
+    <p class="credits">Cartas: <a href="https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola_completa.png" target="_blank" rel="noopener">Baraja española completa</a> (Basquetteur, Germarquezm) · <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es" target="_blank" rel="noopener">CC BY-SA 3.0</a></p>
   </div></div>`;
 }
 
@@ -349,9 +341,7 @@ function render(): void {
         ${playing ? allowedGuesses(game.position).map(guessButton).join('') : ''}
       </section>
       <p class="tap-hint">${playing && selected ? '👆 Toca la carta resaltada para sacar' : '&nbsp;'}</p>
-      <div class="actions">${overlay() === 'none' ? undoButton() : ''}</div>
     </main>
-    <footer>Cartas: <a href="https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola_completa.png" target="_blank" rel="noopener">Baraja española completa</a> (Basquetteur, Germarquezm) · <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es" target="_blank" rel="noopener">CC BY-SA 3.0</a></footer>
     ${overlayHtml()}
     ${rotatePrompt()}`;
   animate = false;
@@ -367,10 +357,8 @@ function render(): void {
 
 function draw(): void {
   if (!selected || pending) return;
-  const before = session;
   const next = playTurn(session, selected, settings.rules);
   selected = null;
-  undoSnapshot = settings.undo && next.game.status !== 'won' ? before : null;
   if (settings.sound) sfx.card();
   if (settings.suspense) {
     pending = next;
@@ -425,7 +413,6 @@ function feedback(correct: boolean, drinks: number, won: boolean): void {
 function startNewGame(): void {
   session = newSession(settings.players, settings.deckSize);
   pending = null;
-  undoSnapshot = null;
   selected = null;
   queue = [];
   settingsOpen = false;
@@ -488,19 +475,13 @@ app.addEventListener('click', (e) => {
     if (shareLeft <= 0) queue.shift();
   } else if (action === 'next-overlay') {
     queue.shift();
-  } else if (action === 'undo' && undoSnapshot) {
-    session = undoSnapshot;
-    undoSnapshot = null;
-    queue = [];
   } else if (action === 'next-player') {
     session = nextPlayer(session);
-    undoSnapshot = null;
     queue = session.game.status === 'deckEmpty' ? ['deckEmpty'] : [];
   } else if (action === 'new-game') {
     startNewGame();
   } else if (action === 'continue') {
     session = { ...session, game: continueWithLastCards(session.game) };
-    undoSnapshot = null;
     queue = [];
   } else if (action === 'settings') {
     settingsOpen = true;
