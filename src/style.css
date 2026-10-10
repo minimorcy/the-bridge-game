@@ -141,6 +141,13 @@ footer a { color: inherit; }
 .panel h2 { margin: 0; }
 .panel p { margin: 0 0 6px; }
 .big { font-size: 4rem; line-height: 1; }
+.explain-btn {
+  align-self: center; width: 40px; height: 40px; padding: 0; border-radius: 999px;
+  font-size: 1.3rem; font-weight: 800; color: var(--gold); border-color: var(--gold);
+}
+.explain { background: rgba(0,0,0,.25); border-radius: 12px; padding: 10px 12px; animation: fade .2s; }
+.explain p { margin: 0; }
+.explain p + p { margin-top: 4px; }
 .wobble { animation: wobble .8s ease-in-out infinite; }
 .choices { display: flex; gap: 10px; justify-content: center; }
 .choices.wrap { flex-wrap: wrap; }

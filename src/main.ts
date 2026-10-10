@@ -1,7 +1,7 @@
 import './style.css';
 import { registerSW } from 'virtual:pwa-register';
 import type { Suit } from './game/deck';
-import { continueWithLastCards, visibleCards } from './game/game';
+import { continueWithLastCards, visibleCards, type Turn } from './game/game';
 import { loadRecord, submitRecord } from './game/record';
 import { allowedGuesses, crossesBridge, type Guess, type Position } from './game/rules';
 import {
@@ -66,6 +66,7 @@ let animate = false;
 let shareLeft = 0;
 let newRecord = false;
 let focusPlayerInput = false;
+let explainOpen = false;
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const overlay = (): Overlay => queue[0] ?? 'none';
@@ -142,14 +143,34 @@ function cleanLine(): string {
     : `<p class="record">✨ ¡Puente limpio! Todos los demás beben 1.</p>`;
 }
 
+const NUMBER_WORD = ['cero', 'uno', 'dos', 'tres', 'cuatro'];
+
+/** Fallar y cruzar el puente a la vez: la explicación queda tras un botón "?". */
+function drinkExplain(): string {
+  const t = session.game.lastTurn!;
+  const failDrinks = t.drinks - 1;
+  const n = NUMBER_WORD[t.drinks] ?? String(t.drinks);
+  if (!explainOpen) {
+    return `<button class="explain-btn" data-action="explain" aria-label="¿Por qué bebo ${n}?">?</button>`;
+  }
+  return `<div class="explain">
+    <p><b>¿Quieres saber por qué bebes ${n}?</b></p>
+    <p>Porque ${failText(t).toLowerCase()} (🍺 ${failDrinks}) y pasas el puente (🍺 1).</p>
+  </div>`;
+}
+
+function failText(t: Turn): string {
+  const doble = settings.rules.asReyDoble && (t.drawn.value === 1 || t.drawn.value === 12);
+  return doble ? `Has fallado con ${t.drawn.value === 1 ? 'un As' : 'un Rey'}` : 'Has fallado';
+}
+
+/** Motivo del trago; vacío al fallar y cruzar, que se explica con el botón "?". */
 function drinkReason(): string {
   const t = session.game.lastTurn!;
   const crossed = crossesBridge(t.from, t.to);
-  const doble = !t.correct && settings.rules.asReyDoble && (t.drawn.value === 1 || t.drawn.value === 12);
-  const fail = doble ? `Has fallado con ${t.drawn.value === 1 ? 'un As' : 'un Rey'} (doble)` : 'Has fallado';
-  if (!t.correct && crossed) return `${fail} y has vuelto a cruzar el puente.`;
+  if (!t.correct && crossed) return '';
   if (crossed) return 'Has cruzado el puente.';
-  return `${fail}.`;
+  return `${failText(t)}${t.drinks > 1 ? ' (doble)' : ''}.`;
 }
 
 function overlayHtml(): string {
@@ -161,7 +182,8 @@ function overlayHtml(): string {
       return panel(`
         <div class="big wobble">🍺</div>
         <h2>${session.solo ? '¡Bebe' : `¡${me}, bebe`} ${drinksWord(t?.drinks ?? 0)}!</h2>
-        <p>${drinkReason()}</p>
+        ${drinkReason() ? `<p>${drinkReason()}</p>` : ''}
+        ${t && !t.correct && crossesBridge(t.from, t.to) ? drinkExplain() : ''}
         <button class="primary" data-action="next-overlay">Hecho</button>
         ${undoButton()}`);
     case 'share':
@@ -339,6 +361,7 @@ function reveal(): void {
   const won = session.game.status === 'won';
   queue = [];
   newRecord = false;
+  explainOpen = false;
   if (t.drinks > 0) queue.push('drink');
   if (t.share > 0) {
     shareLeft = t.share;
@@ -451,6 +474,8 @@ app.addEventListener('click', (e) => {
     settingsOpen = true;
   } else if (action === 'close-settings') {
     settingsOpen = false;
+  } else if (action === 'explain') {
+    explainOpen = true;
   } else if (action === 'portrait') {
     updateSettings({ orientation: 'vertical' });
   } else if (action === 'rotate') {
