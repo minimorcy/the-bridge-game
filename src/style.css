@@ -26,8 +26,8 @@ body {
 #app { max-width: 760px; margin: 0 auto; padding: 0 16px 24px; }
 
 header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 0;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 12px; padding: 12px 0;
 }
 h1 { font-size: 1.3rem; margin: 0; }
 .stats { display: flex; gap: 12px; align-items: center; font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -114,9 +114,9 @@ button.selected { background: #fff; color: var(--ink); border-color: #fff; }
 .undo { font-size: .9rem; padding: 8px 14px; opacity: .85; }
 
 /* Marcador multijugador */
-.scoreboard { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.scoreboard { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; order: 3; flex-basis: 100%; }
 .chip {
-  font-size: .8rem; padding: 4px 10px; border-radius: 999px;
+  white-space: nowrap; font-size: .8rem; padding: 4px 10px; border-radius: 999px;
   background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.2);
   font-variant-numeric: tabular-nums;
 }
@@ -172,6 +172,17 @@ footer a { color: inherit; }
 }
 button:disabled { opacity: .5; cursor: default; }
 
+/* Aviso de girar el móvil: solo en móviles en vertical con la opción horizontal */
+.rotate-prompt { display: none; }
+@media (orientation: portrait) and (pointer: coarse) and (max-width: 600px) {
+  .want-landscape .rotate-prompt {
+    position: fixed; inset: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-dark) 100%);
+  }
+}
+.rotate { animation: rotate-phone 2.4s ease-in-out infinite; }
+
 @keyframes pulse { 50% { transform: translateY(-4px); } }
 @keyframes drop { from { transform: translateY(-60px) rotate(-8deg); opacity: 0; } }
 @keyframes fade { from { opacity: 0; } }
@@ -181,18 +192,24 @@ button:disabled { opacity: .5; cursor: default; }
   55% { transform: rotateY(0) scale(1.08); }
   100% { transform: rotateY(180deg) scale(1); }
 }
+@keyframes rotate-phone { 0%, 25% { transform: rotate(0); } 50%, 85% { transform: rotate(-90deg); } }
 @keyframes wobble { 50% { transform: rotate(-12deg) scale(1.1); } }
 
-/* Apaisado (móvil en horizontal): todo más compacto para que quepa sin scroll */
+/* Apaisado (móvil en horizontal, modo por defecto): marcador en la cabecera y controles
+   compactos para que las cartas sean lo más grandes posible sin scroll */
 @media (orientation: landscape) and (max-height: 520px) {
-  :root { --w: min(130px, calc((100vw - 32px - 4 * var(--gap)) / 5.54), calc((100dvh - 190px) / 1.534)); }
-  header { padding: 6px 0; }
-  .board { margin-top: 8px; }
-  .message { margin: 8px 0 4px; min-height: 1.4em; }
-  .guess { padding: 6px 12px; }
-  .tap-hint { margin: 4px 0; }
-  .actions { min-height: 0; }
-  footer { margin-top: 8px; }
+  :root { --w: min(140px, calc((100vw - 32px - 4 * var(--gap)) / 5.54), calc((100dvh - 150px) / 1.534)); }
+  #app { max-width: 1100px; padding-bottom: 8px; }
+  header { flex-wrap: nowrap; padding: 6px 0; }
+  h1 { font-size: 1.05rem; white-space: nowrap; }
+  .scoreboard { order: 1; flex: 1 1 auto; flex-wrap: nowrap; overflow-x: auto; justify-content: safe center; scrollbar-width: none; }
+  .stats { order: 2; flex-shrink: 0; white-space: nowrap; }
+  .board { margin-top: 4px; }
+  .message { margin: 6px 0 4px; min-height: 1.3em; }
+  .guess { padding: 6px 12px; min-width: 84px; }
+  .tap-hint { display: none; }
+  .actions { position: fixed; right: 12px; bottom: 8px; min-height: 0; }
+  footer { margin-top: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -26,6 +26,7 @@ Se guarda el **récord** del dispositivo (menos tragos en un turno) y el resulta
 |---|---|---|
 | Partida | Baraja de 40 o 48 cartas | 40 |
 | Partida | Jugadores (sin jugadores = solitario) | — |
+| Mesa | Orientación: horizontal (pide girar el móvil) o vertical | Horizontal |
 | Mesa | Sonido | ✅ |
 | Mesa | Vibración (no disponible en iPhone) | ✅ |
 | Mesa | Suspense: la carta se voltea con redoble | ✅ |
@@ -36,6 +37,10 @@ Se guarda el **récord** del dispositivo (menos tragos en un turno) y el resulta
 | Reglas extra | *Puente limpio*: cruzar sin fallar ni una hace beber 1 a todos los demás | ❌ |
 
 La configuración se guarda en el navegador. Baraja y jugadores se aplican en la siguiente partida; el resto, al momento.
+
+### Jugar en horizontal
+
+Por defecto se juega con el móvil girado: las 4 cartas y el puente se ven más grandes. Si abres la app en vertical, te pide girar el móvil. En Android puedes pulsar *Pantalla completa en horizontal*. En iPhone no se puede bloquear la orientación, así que hay que girarlo a mano (con el bloqueo de rotación del sistema desactivado). Si prefieres jugar en vertical, pulsa *Jugar en vertical* o cámbialo en ⚙️.
 
 ### Instalar en el móvil
 
@@ -60,7 +65,7 @@ Estructura:
 
 - `src/game/` – lógica pura y testeada: baraja, reglas, partida, sesión multijugador y récord.
 - `src/settings.ts` – configuración persistida en `localStorage`.
-- `src/ui/` – cartas (sprite `src/assets/baraja-espanola.webp`), efectos de sonido/vibración y wake lock.
+- `src/ui/` – cartas (sprite `src/assets/baraja-espanola.webp`), efectos de sonido/vibración, wake lock y bloqueo de orientación.
 - `src/main.ts` – renderizado y eventos.
 - `assets-src/` – imagen original de la baraja; `public/icons/` – iconos generados.
 - `scripts/generate-assets.mjs` – genera el sprite WebP y los iconos.

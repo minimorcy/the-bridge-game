@@ -17,9 +17,10 @@ import {
   type Session,
   type SessionRules,
 } from './game/session';
-import { loadSettings, saveSettings, type Settings, type Toggle } from './settings';
+import { loadSettings, saveSettings, type Orientation, type Settings, type Toggle } from './settings';
 import { SUIT_LABEL, cardBack, cardFace, cardLabel, suitIcon } from './ui/cards';
 import { sfx, vibrate } from './ui/fx';
+import { canLockLandscape, lockLandscape, unlockOrientation } from './ui/orientation';
 import { setWakeLock } from './ui/wake-lock';
 
 registerSW({ immediate: true });
@@ -41,6 +42,10 @@ const TOGGLES: { key: Toggle; label: string; desc: string }[] = [
   { key: 'suspense', label: 'Suspense', desc: 'La carta sale boca abajo y se voltea con redoble.' },
   { key: 'wakeLock', label: 'Pantalla siempre encendida', desc: 'Evita que el móvil se bloquee mientras jugáis.' },
   { key: 'undo', label: 'Deshacer', desc: 'Permite deshacer el último robo si alguien toca sin querer.' },
+];
+const ORIENTATIONS: { key: Orientation; label: string }[] = [
+  { key: 'horizontal', label: '📱↔️ Horizontal' },
+  { key: 'vertical', label: '📱↕️ Vertical' },
 ];
 const RULES: { key: keyof SessionRules; label: string; desc: string }[] = [
   { key: 'igualReparte', label: 'Igual reparte', desc: 'Acertar "igual" te deja repartir 2 tragos.' },
@@ -241,11 +246,26 @@ function settingsHtml(): string {
     </form>
     <p class="muted">${settings.players.length ? `${settings.players.length} jugadores` : 'Sin jugadores: modo solitario.'}</p>
     <h3>Mesa</h3>
+    <p class="muted">Orientación: en horizontal las cartas se ven más grandes.</p>
+    <div class="choices">
+      ${ORIENTATIONS.map((o) => `<button class="${settings.orientation === o.key ? 'selected' : ''}" data-orientation="${o.key}">${o.label}</button>`).join('')}
+    </div>
     ${TOGGLES.map((t) => toggle('data-toggle', t.key, t.label, t.desc, settings[t.key])).join('')}
     <h3>Reglas extra</h3>
     ${RULES.map((r) => toggle('data-rule', r.key, r.label, r.desc, settings.rules[r.key])).join('')}
     <button class="primary" data-action="new-game">Nueva partida</button>
     <button data-action="close-settings">Cerrar</button>
+  </div></div>`;
+}
+
+/** Siempre en el DOM; el CSS lo muestra solo en móviles en vertical con la opción horizontal. */
+function rotatePrompt(): string {
+  return `<div class="rotate-prompt"><div class="panel">
+    <div class="big rotate">📱</div>
+    <h2>Gira el móvil</h2>
+    <p>El Puente se juega en horizontal: las cartas se ven más grandes.</p>
+    ${canLockLandscape() ? `<button class="primary" data-action="rotate">🔄 Pantalla completa en horizontal</button>` : ''}
+    <button data-action="portrait">Jugar en vertical</button>
   </div></div>`;
 }
 
@@ -260,8 +280,8 @@ function render(): void {
         <span title="Cartas en la baraja">🂠 ${game.deck.length}</span>
         <button class="icon" data-action="settings" aria-label="Configuración">⚙️</button>
       </div>
+      ${scoreboard()}
     </header>
-    ${scoreboard()}
     <main>
       <section class="board">
         ${slot(0)}${slot(1)}
@@ -276,8 +296,11 @@ function render(): void {
       <div class="actions">${overlay() === 'none' ? undoButton() : ''}</div>
     </main>
     <footer>Cartas: <a href="https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola_completa.png" target="_blank" rel="noopener">Baraja española completa</a> (Basquetteur, Germarquezm) · <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.es" target="_blank" rel="noopener">CC BY-SA 3.0</a></footer>
-    ${overlayHtml()}`;
+    ${overlayHtml()}
+    ${rotatePrompt()}`;
   animate = false;
+  // En apaisado el marcador es una fila con scroll: mantener visible al jugador actual
+  app.querySelector('.chip.current')?.scrollIntoView({ block: 'nearest', inline: 'center' });
   if (focusPlayerInput) {
     app.querySelector<HTMLInputElement>('.add-player input')?.focus();
     focusPlayerInput = false;
@@ -353,9 +376,19 @@ function startNewGame(): void {
 }
 
 function updateSettings(change: Partial<Settings>): void {
+  const orientationChanged = change.orientation !== undefined && change.orientation !== settings.orientation;
   settings = { ...settings, ...change };
   saveSettings(settings);
   setWakeLock(settings.wakeLock);
+  if (orientationChanged) applyOrientation(false);
+}
+
+/** Sin toque previo solo funciona en la app instalada; si falla, queda el aviso de girar. */
+function applyOrientation(withFullscreen: boolean): void {
+  const horizontal = settings.orientation === 'horizontal';
+  document.body.classList.toggle('want-landscape', horizontal);
+  if (horizontal) void lockLandscape(withFullscreen);
+  else unlockOrientation();
 }
 
 function shareResult(): void {
@@ -372,10 +405,10 @@ function shareResult(): void {
 
 app.addEventListener('click', (e) => {
   const el = (e.target as HTMLElement).closest<HTMLElement>(
-    '[data-guess],[data-slot],[data-action],[data-deck],[data-remove],[data-give]',
+    '[data-guess],[data-slot],[data-action],[data-deck],[data-orientation],[data-remove],[data-give]',
   );
   if (!el) return;
-  const { guess, slot, action, deck, remove, give } = el.dataset;
+  const { guess, slot, action, deck, orientation, remove, give } = el.dataset;
 
   if (guess && !pending) {
     selected = selected === guess ? null : (guess as Guess);
@@ -384,6 +417,8 @@ app.addEventListener('click', (e) => {
     return;
   } else if (deck) {
     updateSettings({ deckSize: deck === '48' ? 48 : 40 });
+  } else if (orientation) {
+    updateSettings({ orientation: orientation === 'vertical' ? 'vertical' : 'horizontal' });
   } else if (remove !== undefined) {
     updateSettings({ players: settings.players.filter((_, i) => i !== Number(remove)) });
   } else if (give !== undefined) {
@@ -410,6 +445,11 @@ app.addEventListener('click', (e) => {
     settingsOpen = true;
   } else if (action === 'close-settings') {
     settingsOpen = false;
+  } else if (action === 'portrait') {
+    updateSettings({ orientation: 'vertical' });
+  } else if (action === 'rotate') {
+    void lockLandscape(true);
+    return;
   } else if (action === 'share-result') {
     shareResult();
     return;
@@ -438,4 +478,5 @@ app.addEventListener('submit', (e) => {
 });
 
 setWakeLock(settings.wakeLock);
+applyOrientation(false);
 render();

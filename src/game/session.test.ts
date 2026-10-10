@@ -140,4 +140,10 @@ describe('configuración', () => {
     expect(s.players).toEqual(['Ana']);
     expect(s.rules).toEqual({ igualReparte: false, asReyDoble: true, puenteLimpio: false });
   });
+
+  it('orientación horizontal por defecto, vertical si se eligió', () => {
+    expect(DEFAULT_SETTINGS.orientation).toBe('horizontal');
+    expect(parseSettings(JSON.stringify({ orientation: 'vertical' })).orientation).toBe('vertical');
+    expect(parseSettings(JSON.stringify({ orientation: 'diagonal' })).orientation).toBe('horizontal');
+  });
 });

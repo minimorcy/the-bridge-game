@@ -2,8 +2,11 @@ import type { DeckSize } from './game/deck';
 import { safeStorage } from './game/record';
 import { MAX_PLAYERS, type SessionRules } from './game/session';
 
+export type Orientation = 'horizontal' | 'vertical';
+
 export interface Settings {
   deckSize: DeckSize;
+  orientation: Orientation;
   players: string[];
   sound: boolean;
   vibration: boolean;
@@ -17,6 +20,7 @@ export type Toggle = 'sound' | 'vibration' | 'suspense' | 'wakeLock' | 'undo';
 
 export const DEFAULT_SETTINGS: Settings = {
   deckSize: 40,
+  orientation: 'horizontal',
   players: [],
   sound: true,
   vibration: true,
@@ -42,6 +46,7 @@ export function parseSettings(raw: string | null | undefined): Settings {
   const rules: Partial<SessionRules> = s.rules ?? {};
   return {
     deckSize: s.deckSize === 48 ? 48 : 40,
+    orientation: s.orientation === 'vertical' ? 'vertical' : 'horizontal',
     players: Array.isArray(s.players)
       ? s.players.filter((n): n is string => typeof n === 'string' && n.trim() !== '').slice(0, MAX_PLAYERS)
       : [],
