@@ -204,6 +204,14 @@ function overlayHtml(): string {
   const me = escapeHtml(currentPlayer(session).name);
   switch (overlay()) {
     case 'drink':
+      // Cruzar hacia arriba es un acierto: se celebra con un brindis, no parece un fallo
+      if (t?.correct && crossesBridge(t.from, t.to)) {
+        return panel(`
+          <div class="big cheers">🍻</div>
+          <h2>¡${session.solo ? 'Puente' : `${me}, puente`} superado!</h2>
+          <p>Has acertado y pasas al otro lado. Brinda con ${drinksWord(t.drinks)} 🥂</p>
+          <button class="primary" data-action="next-overlay">¡Salud!</button>`);
+      }
       return panel(`
         <div class="big wobble">🍺</div>
         <h2>${session.solo ? '¡Bebe' : `¡${me}, bebe`} ${drinksWord(t?.drinks ?? 0)}!</h2>

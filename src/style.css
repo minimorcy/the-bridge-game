@@ -152,6 +152,7 @@ button.link { border: 0; background: none; padding: 6px 0 0; color: var(--gold);
 .steps { margin: 0; padding-left: 1.4em; text-align: left; display: flex; flex-direction: column; gap: 6px; }
 .panel.slow { max-height: calc(100dvh - 32px); overflow-y: auto; }
 .wobble { animation: wobble .8s ease-in-out infinite; }
+.cheers { animation: cheers .9s ease-in-out infinite; }
 .choices { display: flex; gap: 10px; justify-content: center; }
 .choices.wrap { flex-wrap: wrap; }
 .muted { opacity: .7; font-size: .85rem; }
@@ -204,6 +205,7 @@ button:disabled { opacity: .5; cursor: default; }
 }
 @keyframes rotate-phone { 0%, 25% { transform: rotate(0); } 50%, 85% { transform: rotate(-90deg); } }
 @keyframes wobble { 50% { transform: rotate(-12deg) scale(1.1); } }
+@keyframes cheers { 30% { transform: translateY(-10px) scale(1.15); } 60% { transform: translateY(0) scale(1); } }
 
 /* Apaisado (móvil en horizontal, modo por defecto): marcador en la cabecera y controles
    compactos para que las cartas sean lo más grandes posible sin scroll */
